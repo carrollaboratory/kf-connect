@@ -88,9 +88,6 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
 
     if args.host:
-        import pdb
-
-        pdb.set_trace()
         if not args.port:
             args.port = hostcfg.get("warehouse").get(args.host).get("port")
         if not args.hostname:
