@@ -96,6 +96,8 @@ def parse_args() -> argparse.Namespace:
             args.hostname = hostcfg.get("warehouse").get(args.host).get("host")
         if not args.local_port:
             args.local_port = hostcfg.get("warehouse").get(args.host).get("local-port")
+        if not args.environment:
+            args.environment = hostcfg.get("warehouse").get(args.host).get("env")
     return args
 
 

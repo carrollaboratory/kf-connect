@@ -1,0 +1,13 @@
+# The official kfhosts file should exist in your home directory as ~/.kfhosts
+# The root should be warehouse, inside of which can be as many options as you need
+# host is required. All others are optional, though, I recommend specifying the port
+warehouse:
+  inc:
+    # Amazon database server url
+    host: include-data-warehouse-dev.magic-us-east-1.rds.amazonaws.com
+    # Specify the port the database listens on
+    port: 5432
+    # optionally provide the port you want the local forwarded from
+    local-port: 54321
+    # Specify the environment this is listed under
+    env: dev
