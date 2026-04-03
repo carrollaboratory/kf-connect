@@ -1,0 +1,42 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "setuptools_scm"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "kfconnect"
+authors = [
+  { name = "Eric Torstenson", email = "eric.s.torstenson@vumc.org" }
+]
+description = "Helper scripts for interacting with kf aws infrastructure locally."
+readme = "README.md"
+requires-python = ">=3.13"
+
+dynamic = ["version"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+  "PyYAML",
+  "rich"
+]
+
+
+[tool.setuptools_scm]
+version_file = "kfconnect/_version.py"
+
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ['kfconnect']
+
+[project.scripts]
+kfdb = "kfconnect.kfdb:main"
