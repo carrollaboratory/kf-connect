@@ -15,6 +15,8 @@ import sys
 from pathlib import Path
 
 from rich import print
+from rich.console import Console
+from rich.table import Table
 from yaml import safe_load
 
 
@@ -92,6 +94,8 @@ def parse_args() -> argparse.Namespace:
             args.port = hostcfg.get("warehouse").get(args.host).get("port")
         if not args.hostname:
             args.hostname = hostcfg.get("warehouse").get(args.host).get("host")
+        if not args.local_port:
+            args.local_port = hostcfg.get("warehouse").get(args.host).get("local-port")
     return args
 
 
@@ -174,6 +178,17 @@ def start_tunnel(
     local_port: int,
     hostname: str,
 ) -> None:
+    console = Console()
+    table = Table(title="DB Configuration", row_styles=["white", "yellow"])
+    table.add_column("Parameter", style="bold")
+    table.add_column("Value")
+
+    table.add_row("Host", hostname)
+    table.add_row("Instance ID", instance_id)
+    table.add_row("Remote Port", str(port))
+    table.add_row("Local Port", str(local_port))
+    table.add_row("Region", region)
+    console.print(table)
     parameters = json.dumps(
         {
             "portNumber": [str(port)],
