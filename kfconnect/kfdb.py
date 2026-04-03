@@ -35,8 +35,10 @@ def parse_args() -> argparse.Namespace:
             hostcfg = safe_load(file)
             available_hosts = hostcfg["warehouse"].keys()
 
+    from kfconnect._version import __version__ as version
+
     parser = argparse.ArgumentParser(
-        description="Open an AWS SSM port-forwarding session to a remote host via a bastion.",
+        description=f"kfconnect {version}: Open an AWS SSM port-forwarding session to a remote host via a bastion.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         epilog=epilog,
     )
