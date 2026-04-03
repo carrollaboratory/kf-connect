@@ -87,17 +87,27 @@ def parse_args() -> argparse.Namespace:
         default="saml",
         help="AWS CLI profile to use for SAML login and all subsequent calls.",
     )
+    parser.add_argument(
+        "--force",
+        "-f",
+        action="store_true",
+        help="Refresh aws login credentials, even if they aren't expired",
+    )
     args = parser.parse_args()
-
+    args.role = None
     if args.host:
+        warehouse = hostcfg.get("warehouse").get(args.host)
         if not args.port:
-            args.port = hostcfg.get("warehouse").get(args.host).get("port")
+            args.port = warehouse.get("port")
         if not args.hostname:
-            args.hostname = hostcfg.get("warehouse").get(args.host).get("host")
+            args.hostname = warehouse.get("host")
         if not args.local_port:
-            args.local_port = hostcfg.get("warehouse").get(args.host).get("local-port")
+            args.local_port = warehouse.get("local-port")
         if not args.environment:
-            args.environment = hostcfg.get("warehouse").get(args.host).get("env")
+            args.environment = warehouse.get("env")
+
+        args.role = warehouse.get("role")
+
     return args
 
 
@@ -110,10 +120,28 @@ def run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
     return result
 
 
-def saml_login(profile: str) -> None:
+def saml_login(profile: str, force: bool = False, role: str | None = None) -> None:
     """Perform AWS SSO / SAML login for the given profile."""
     print(f"[*] Logging in with AWS profile '{profile}' ...", file=sys.stderr)
-    run(["saml2aws", "login", "--profile", profile])
+    if force:
+        do_force = "--force"
+    else:
+        do_force = "--no-force"
+    roleargs = []
+    if role:
+        roleargs = ["--role", role]
+
+    console = Console()
+    table = Table(title="saml2aws Login", row_styles=["white", "yellow"])
+    table.add_column("Parameter", style="bold")
+    table.add_column("Value")
+
+    table.add_row("Profile", profile)
+    table.add_row("Role", role)
+    console.print(table)
+
+    print(" ".join(["saml2aws", "login", "--profile", profile, do_force] + roleargs))
+    run(["saml2aws", "login", "--profile", profile, do_force] + roleargs)
 
 
 def get_region(profile: str, region_override: str | None) -> str:
@@ -225,11 +253,10 @@ def start_tunnel(
 def main() -> None:
     args = parse_args()
 
-    print(args)
     if args.local_port is None:
         args.local_port = args.port
 
-    saml_login(args.profile)
+    saml_login(args.profile, force=args.force, role=args.role)
     region = get_region(args.profile, args.region)
     instance_id = get_instance_id(args.profile, region, args.environment)
     start_tunnel(

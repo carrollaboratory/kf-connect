@@ -11,3 +11,7 @@ warehouse:
     local-port: 54321
     # Specify the environment this is listed under
     env: dev
+    # Specify the role used by this connection.
+    # To discover the roles your login has available, use the following command
+    # saml2aws list-roles
+    role: arn:aws:iam:1234567890:role/Some-Awesome-Role
